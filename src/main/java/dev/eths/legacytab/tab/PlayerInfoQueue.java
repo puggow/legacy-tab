@@ -28,7 +28,7 @@ public class PlayerInfoQueue {
 
         tabPlayer.getUser().sendPacket(
                 new WrapperPlayServerPlayerInfo(
-                    WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER,
+                    action,
                     new ArrayList<>(queue) // Copy because we will reuse the queue
                 )
         );
