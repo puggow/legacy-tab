@@ -1,7 +1,6 @@
 plugins {
-    id 'java'
-    id 'io.freefair.lombok' version '6.5.1'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'java-library'
+    id 'maven-publish'
 }
 
 group 'dev.eths'
@@ -20,19 +19,33 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT"
-    implementation "com.github.retrooper:packetevents-spigot:2.6.0-SNAPSHOT"
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+    compileOnly "com.github.retrooper:packetevents-spigot:2.13.0"
+    compileOnly "org.projectlombok:lombok:1.18.42"
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
 }
 
 compileJava {
     options.encoding = "UTF-8"
+    options.release.set(8)
 }
 
-tasks.build {
-    dependsOn shadowJar
+tasks.jar {
+    exclude 'plugin.yml'
+}
+
+def pluginJar = tasks.register('pluginJar', Jar) {
+    archiveClassifier.set('plugin')
+    from sourceSets.main.output
+}
+
+tasks.assemble {
+    dependsOn pluginJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
 }

@@ -2,3 +2,5 @@ name: legacy-tab
 main: dev.eths.legacytab.LegacyTabPlugin
 version: 1.0
 author: Eths
+depend:
+  - packetevents
