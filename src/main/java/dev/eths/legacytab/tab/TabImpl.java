@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams.ScoreBoardTeamInfo;
 import lombok.Getter;
 import dev.eths.legacytab.player.WrappedTabPlayer;
 import dev.eths.legacytab.tab.types.TabColumn;
@@ -48,6 +49,26 @@ public class TabImpl {
         }
 
         addQueue.flush();
+    }
+
+    public void close() {
+        for (Map.Entry<Integer, TabElement> entry : elements.entrySet()) {
+            TabElement element = entry.getValue();
+            removeQueue.push(new WrapperPlayServerPlayerInfo.PlayerData(
+                    Component.text(tabPlayer.isLegacy() ? CODES.get(entry.getKey()) : element.getText()),
+                    element.getUserProfile(), GameMode.SURVIVAL, element.getPing()));
+
+            if (tabPlayer.isLegacy())
+                tabPlayer.getUser().sendPacket(new WrapperPlayServerTeams(
+                        element.getUserProfile().getName(), WrapperPlayServerTeams.TeamMode.REMOVE,
+                        (ScoreBoardTeamInfo) null, Collections.emptyList()));
+        }
+
+        removeQueue.flush();
+        elements.clear();
+
+        if (!tabPlayer.isLegacy())
+            tabPlayer.getUser().sendPacket(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
     }
 
     public TabElement getElement(int row, TabColumn column) {
@@ -152,6 +173,9 @@ public class TabImpl {
     }
 
     private void updateHeaderFooter(Pair<List<String>, List<String>> newHeaderFooter) {
+        if (tabPlayer.isLegacy())
+            return;
+
         List<String> header = newHeaderFooter.getKey();
         List<String> footer = newHeaderFooter.getValue();
 

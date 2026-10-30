@@ -1,25 +1,24 @@
 package dev.eths.legacytab;
 
-import lombok.Getter;
 import dev.eths.legacytab.listener.PlayerJoinListener;
 import dev.eths.legacytab.listener.PlayerQuitListener;
-import dev.eths.legacytab.player.WrappedTabPlayer;
-import dev.eths.legacytab.tab.TabAdapter;
-import dev.eths.legacytab.thread.LegacyTabThread;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 public class LegacyTabPlugin extends JavaPlugin {
 
+    private LegacyTab service;
+
+    @Override
     public void onEnable() {
-        new LegacyTab(this);
+        this.service = new LegacyTab(this);
+        new PlayerJoinListener(this, this.service);
+        new PlayerQuitListener(this, this.service);
     }
 
+    @Override
     public void onDisable() {
-
+        if (this.service != null)
+            this.service.close();
     }
 
 }
