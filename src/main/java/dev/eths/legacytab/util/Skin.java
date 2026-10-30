@@ -8,6 +8,7 @@ import lombok.Getter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public class Skin {
      * @return Matches
      */
     public boolean matches(Skin skin) {
-        return value.equals(skin.getValue()) && signature.equals(skin.getSignature());
+        return value.equals(skin.getValue()) && Objects.equals(signature, skin.getSignature());
     }
 
     public static final Skin LIGHT_GRAY = new Skin(
